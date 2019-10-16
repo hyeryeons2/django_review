@@ -9,6 +9,8 @@
 <body>
   <header>
     <h1>페이지에 오신 걸 환영합니다:)</h1>
+    <a href="{% url 'articles:index' %}">[목록]</a> 
+    <hr>
   </header>
   {% block container %}{% endblock container %}
 </body>

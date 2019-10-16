@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Article: Index{% endblock title %}
+
+{% block container %}
+  <hr>
+  <h2>Article list</h2>
+  <a href="{% url 'articles:create' %}">[생성하기]</a>
+  {% for article in articles %}
+  <div>
+    <h3>{{ article.pk }}. {{ article.title }}</h3>
+    {% comment %} article:detail 페이지로 넘어간다. {% endcomment %}
+    <a href=" {% url 'articles:detail' article.pk %} ">[상세보기]</a>
+  </div>
+  <br>
+  {% endfor %}
+{% endblock container %}

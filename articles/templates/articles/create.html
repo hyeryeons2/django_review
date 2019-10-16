@@ -2,10 +2,15 @@
 
 {% block title %} Article: Create{% endblock title %}
 
+{% comment %} 
+POST요청으로 보내면 url은 동일한데 method만 다르게(/articles/create/) 
+{% endcomment %}
 {% block container %}
-<form>
-  <input type="text"><br>
-  <textarea name="" cols="30" rows="10"></textarea><br>
+<form method="POST" action="{% url 'articles:create' %}" >
+  {% csrf_token %}
+  {{ form.as_p }}
+  {% comment %} <input type="text"><br>
+  <textarea name="" cols="30" rows="10"></textarea><br> {% endcomment %}
   <button type="submit">생성하기</button>
 </form>
 {% endblock container %}
