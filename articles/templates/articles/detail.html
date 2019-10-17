@@ -11,10 +11,33 @@
   <p>{{ article.content }}</p>
   <hr>
   <a href=" {% url 'articles:update' article.pk %} ">[수정하기]</a>
-
+  <br>
+  <br>
   {% comment %} /articles/3/delete/로 보내야 하니까 action {% endcomment %}
   <form action="{% url 'articles:delete' article.pk %}" method="POST">
     {% csrf_token %}
     <button type="submit">[삭제하기]</button>
   </form>
+
+  {% comment %} comment 작성 {% endcomment %}
+  <form action=" {% url 'articles:comments_create' article.pk %}" method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">댓글쓰기</button>
+  </form>
+
+  {% comment %} 댓글표시 {% endcomment %}
+  <ul>
+  {% for comment in comments %}
+    <li>
+      {{ comment.content }}
+      <form method="POST" action=" {% url 'articles:comments_delete' comment.pk %} ">
+      {% csrf_token %}
+      <button type="submit">삭제하기</button>
+      </form>
+    </li>
+  {% endfor %}
+  </ul>
+
+
 {% endblock container %}

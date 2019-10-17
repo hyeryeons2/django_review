@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404  # redirect 추가
 from django.views.decorators.http import require_POST, require_GET
-from .forms import ArticleForm
-from .models import Article
+from .forms import ArticleForm, CommentForm
+from .models import Article, Comment
 # from IPython import embed 
 
 # Create your views here.
@@ -17,9 +17,18 @@ def detail(request, article_pk):
     # 사용자가 url에 적어보낸 article_pk를 통해 디테일 페이지 보여준다
     # article 있다면 하나 꺼내서 보여주고 없으면 404 페이지 보여줌
     article = get_object_or_404(Article, pk=article_pk)
+    # commentform에 맞는 form 형식받는 것;get
+    form = CommentForm()
+    # 해당 article pk 에 있는 comments를 모두 가져온다
+    comments = article.comments.all()
+    # 혹은, comments = Comment.objects.all()로도 사용함
 
     # context에 담아야 templates로 보낼 수 있으니까, context 작업
-    context = {'article': article}
+    context = {
+        'article': article,
+        'form': form,
+        'comments': comments,
+        }
     return render(request, 'articles/detail.html', context)
     # return render(request, 'article/detail.html', {'article': article})
     # 이렇게 나와도 전혀 상관없음(틀린게 아님!)
@@ -76,3 +85,27 @@ def delete(request, article_pk):
     # article 이 있다면(no 404 page) 삭제
     article.delete()
     return redirect('articles:index')
+
+# detail 페이지에서 다 처리할 것이기 때문에 get이 따로 없으므로
+# require_POST 처리함    
+@require_POST
+def comments_create(request, article_pk):
+    article = get_object_or_404(Article, pk=article_pk)
+    form = CommentForm(request.POST)
+    if form.is_valid():
+        # 완전히 db에 반영하지는 말자 commit=False(임시저장)
+        comment = form.save(commit=False)
+        comment.article_id = article.pk
+        # 이 작업이 끝나면 comment에 content와 id가 다 들어가고, 그걸 저장한다
+        comment.save()
+    # 유효하든, 유효하지않든 이 화면 보여준다
+    return redirect('articles:detail', article.pk)
+
+@require_POST
+def comments_delete(request, comment_pk):
+    comment = get_object_or_404(Comment, pk=comment_pk)
+    article_pk = comment.article_id
+    comment.delete()
+    # article = get_object_or_404(Article, pk=article_pk) 안했으니까
+    # article.pk 못씀
+    return redirect('articles:detail', article_pk)
