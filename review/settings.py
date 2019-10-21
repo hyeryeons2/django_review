@@ -33,6 +33,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     # local apps
     'articles',
+    'accounts',
 
     # third party apps
     'django_extensions',

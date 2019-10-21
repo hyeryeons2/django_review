@@ -17,6 +17,7 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
+    path('accounts/', include('accounts.urls')),
     # articles/로 들어오면 게시글 내용 제공한다
     path('articles/', include('articles.urls')),
     path('admin/', admin.site.urls),

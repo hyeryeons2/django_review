@@ -13,6 +13,7 @@ class Article(models.Model):
 
 class Comment(models.Model):
     # article 참조키(foreign key)
+    # relatedname은 나중에 views.py>detail 에서 comments = article.comments.all()
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name='comments')
     content = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
