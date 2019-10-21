@@ -1,9 +1,16 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  {% comment %} 직접 bootstarp 가져오기 {% endcomment %}
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-reboot.min.css' %}">
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-grid.min.css' %}">
+  <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+
   <title>{% block title %}{% endblock title %}</title>
 </head>
 
@@ -11,14 +18,31 @@
   <header>
     <h1>페이지에 오신 걸 환영합니다:)</h1>
 
+    {% comment %} 로그인이 되었다면, {% endcomment %}
+    {% if user.is_authenticated %}
     {% comment %} user은 templates 가 기본적으로 가지고 있는 것이므로 따로 정의 안해도 사용 가능함 {% endcomment %}
     <span><h2>안녕하세요, {{ user.username }}님!</h2></span>
     <p> <a href="{% url 'accounts:logout' %}">로그아웃</a></p>
+    <form action=" {% url 'accounts:delete' %} " method="POST">
+    {% csrf_token %}
+    <button type="submit">회원탈퇴</button>
+    </form>
     <hr>
+    {% comment %} 로그인 된 상태가 아니면, {% endcomment %}
+    {% else %}  
+    <p>
+    <a href=" {% url 'accounts:login' %} ">로그인</a>
+    <a href=" {% url 'accounts:signup' %} ">회원가입</a>
+    </p>
+    {% endif %}
 
     <a href="{% url 'articles:index' %}">[목록]</a> 
     <hr>
   </header>
   {% block container %}{% endblock container %}
+
+  {% comment %} js 가져오기 {% endcomment %}
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src=" {% static 'bootstrap/js/bootstrap.bundle.min.js' %} "></script>
 </body>
 </html>

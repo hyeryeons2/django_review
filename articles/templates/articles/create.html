@@ -6,7 +6,7 @@
 POST요청으로 보내면 url은 동일한데 method만 다르게(/articles/create/) 
 {% endcomment %}
 {% block container %}
-<form method="POST" action="{% url 'articles:create' %}" >
+<form method="POST">
   {% csrf_token %}
   {{ form.as_p }}
   {% comment %} <input type="text"><br>
