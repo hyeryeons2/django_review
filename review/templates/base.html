@@ -16,27 +16,31 @@
 
 <body>
   <header>
-    <h1>페이지에 오신 걸 환영합니다:)</h1>
+    <h1 class="text-primary">페이지에 오신 걸 환영합니다:)</h1><br>
 
     {% comment %} 로그인이 되었다면, {% endcomment %}
     {% if user.is_authenticated %}
     {% comment %} user은 templates 가 기본적으로 가지고 있는 것이므로 따로 정의 안해도 사용 가능함 {% endcomment %}
-    <span><h2>안녕하세요, {{ user.username }}님!</h2></span>
-    <p> <a href="{% url 'accounts:logout' %}">로그아웃</a></p>
+    <h2>안녕하세요,  <span class="text-success">{{ user.username }}</span>님!</h2><br>
+    <p>
+    <a href="{% url 'accounts:logout' %}" >로그아웃</a>
+    <a href=" {% url 'accounts:update' %} ">회원정보수정</a>
+    </p>
+
     <form action=" {% url 'accounts:delete' %} " method="POST">
     {% csrf_token %}
-    <button type="submit">회원탈퇴</button>
+    <button type="submit" class="btn btn-success">회원탈퇴</button>
     </form>
     <hr>
     {% comment %} 로그인 된 상태가 아니면, {% endcomment %}
     {% else %}  
     <p>
-    <a href=" {% url 'accounts:login' %} ">로그인</a>
+    <a href=" {% url 'accounts:login' %} " >로그인</a>
     <a href=" {% url 'accounts:signup' %} ">회원가입</a>
     </p>
     {% endif %}
 
-    <a href="{% url 'articles:index' %}">[목록]</a> 
+    <a href="{% url 'articles:index' %}">[홈 화면]</a> 
     <hr>
   </header>
   {% block container %}{% endblock container %}

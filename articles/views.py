@@ -24,7 +24,8 @@ def detail(request, article_pk):
     # 해당 article pk 에 있는 comments를 모두 가져온다
     comments = article.comments.all()
     # 혹은, comments = Comment.objects.all()로도 사용함
-
+    # 혹은, comments = article.comment_set.all()
+    
     # context에 담아야 templates로 보낼 수 있으니까, context 작업
     context = {
         'article': article,
@@ -36,15 +37,17 @@ def detail(request, article_pk):
     # 이렇게 나와도 전혀 상관없음(틀린게 아님!)
 
 # 로그인 된 상태에서만 CREATE 실행
-@login_required
+@login_required  # get요청으로 감
 def create(request):
     # 만약 사용자가 보낸 method가 POST(Article을 생성해달라고 하는 요청)
     if request.method == 'POST':
-        form = ArticleForm(request.POST)
+        form = ArticleForm(request.POST)  # 여기로 들어오는 건 title, content
         # embed()  # 실행중 python shell 실행
-        if form.is_valid():  # 유효하다면,
-            form.save()
-            return redirect('articles:index')
+        if form.is_valid():  # 유효하다면, 이 땐, title 과 content가 valid 한지 판별
+            article = form.save(commit=False)  # article을 바로 db에 반영하지 않고 
+            article.user = request.user # 로그인 된 유저 정보를 생성하려고 하는 ariticle user 정보로 넣겠다 
+            article.save()
+            return redirect('articles:detail', article.pk)
         # else:  # 유효하지 않다면,(ex. 20자짜리인데 200자가 들어간 경우,))
         #     context = {'form': form}
         #     return render(request, 'articles/create.html', context)
@@ -61,20 +64,25 @@ def update(request, article_pk):
     article = get_object_or_404(Article, pk=article_pk)
     # get일 때와 post일 때 나눠서 작업해야함
 
-    # POST 로 들어오면 UPDATE 로직을 수행한다
-    if request.method == 'POST':
-        # model form 활용
-        # 기존에 받은 instance(article)을 form에 추가한다
-        form = ArticleForm(request.POST, instance=article)
-        if form.is_valid():
-            form.save()
-            return redirect('articles:detail', article_pk)
-    else:  # get
-        # model form 활용
-        # form에 아무것도 넣지 않으면 빈칸으로 form이 보여짐
-        # instance에 article을 넣으면, article에 있던 내용이 저장된 채로 보여짐
-        form = ArticleForm(instance=article)  # form 안에 특정 article 담아서 생성하겠다
-        # 위에서 정의한 form을 context로 넘겨줌
+    # article 작성자인 경우에만 update 가능하게 하는 작업
+    if article.user == request.user:
+        # POST 로 들어오면 UPDATE 로직을 수행한다
+        if request.method == 'POST':
+            # model form 활용
+            # 기존에 받은 instance(article)을 form에 추가한다
+            form = ArticleForm(request.POST, instance=article)
+            if form.is_valid():
+                form.save()
+                return redirect('articles:detail', article_pk)
+    
+        else:  # get
+            # model form 활용
+            # form에 아무것도 넣지 않으면 빈칸으로 form이 보여짐
+            # instance에 article을 넣으면, article에 있던 내용이 저장된 채로 보여짐
+            form = ArticleForm(instance=article)  # form 안에 특정 article 담아서 생성하겠다
+            # 위에서 정의한 form을 context로 넘겨줌
+    else:
+        return redirect('articles:detail', article_pk)
     context = {'form': form}
     return render(request, 'articles/update.html', context)
 
@@ -89,8 +97,11 @@ def delete(request, article_pk):
     # article_pk에 맞는 article을 꺼내서 삭제함
     # 삭제할 article 꺼내는 작업
         article = get_object_or_404(Article, pk=article_pk)
-    # article 이 있다면(no 404 page) 삭제
-        article.delete()
+        if article.user == request.user:
+        # article 이 있다면(no 404 page) 삭제
+            article.delete()
+        else:
+            return redirect('articles:detail', article_pk)
     return redirect('articles:index')
 
 
@@ -99,6 +110,7 @@ def delete(request, article_pk):
 # @login_required ; post ㄴㄴ 
 @require_POST
 def comments_create(request, article_pk):
+    # 사용자가 로그인 되었을 때에만
     if request.user.is_authenticated:
         form = CommentForm(request.POST)
 
@@ -107,7 +119,8 @@ def comments_create(request, article_pk):
             comment = form.save(commit=False)
             comment.article_id = article_pk
             # 이 작업이 끝나면 comment에 content와 id가 다 들어가고, 그걸 저장한다
-            comment.save()
+            comment.user = request.user 
+            comment.save()            
         # 유효하든, 유효하지않든 이 화면 보여준다
     return redirect('articles:detail', article_pk)
 
@@ -117,7 +130,10 @@ def comments_create(request, article_pk):
 def comments_delete(request, article_pk, comment_pk):
     if request.user.is_authenticated:
         comment = get_object_or_404(Comment, pk=comment_pk)
-        comment.delete()
+        article = get_object_or_404(Article, pk=article_pk)
+        # 로그인한 사람이랑 코멘트 단 사람 같으면,
+        if comment.user == request.user or article.user == request.user:
+            comment.delete()
     # article = get_object_or_404(Article, pk=article_pk) 안했으니까
     # article.pk 못씀
         return redirect('articles:detail', article_pk)

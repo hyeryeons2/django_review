@@ -7,28 +7,27 @@
   {% comment %} <a href="{% url 'articles:index' %}">[목록]</a>  {% endcomment %}
   <h2>{{ article.title }}</h2>
   <p>{{ article.created_at }}</p>
+  <p class="text-secondary"> 작성자: {{ article.user }}</p>
   <hr>
   <p>{{ article.content }}</p>
   <hr>
   
-  {% if user.is_authenticated %}
+  {% comment %} 작성자 == 로그인한 유저일 때에만 수정하기 버튼이 보임 {% endcomment %}
+  {% if article.user == request.user %}
   <a href=" {% url 'articles:update' article.pk %} ">[수정하기]</a>
-  {% else %}
-  <a href=" {% url 'accounts:login' %} ">수정은 로그인 후 가능합니다</a>
-  {% endif %}
-  <br>
   <hr>
+  {% endif %}
+ 
 
-  {% if user.is_authenticated %}
+  {% if article.user == request.user %}
   {% comment %} /articles/3/delete/로 보내야 하니까 action {% endcomment %}
   <form action="{% url 'articles:delete' article.pk %}" method="POST">
     {% csrf_token %}
     <button type="submit">삭제하기</button>
   </form>
-  {% else %}
-  <a href=" {% url 'accounts:login' %} ">삭제는 로그인 후 가능합니다</a>
-  {% endif %}
   <hr>
+  {% endif %}
+
 
   {% comment %} comment 작성 {% endcomment %}
   {% if user.is_authenticated %}
@@ -46,15 +45,19 @@
   <ul>
   {% for comment in comments %}
     <li>
-      {% if user.is_authenticated %}
+      {% if request.user == comment.user or request.user == article.user %}
       <form method="POST" action=" {% url 'articles:comments_delete' article.pk comment.pk %} ">
         {% csrf_token %}
-        <span>{{ comment.content }} - {{ comment.created_at }}</span>
-        <button type="submit">삭제하기</button>
+        <p>
+        <span class="text-primary">
+        [{{ comment.user }}]{{ comment.content }} ({{ comment.created_at }})
+        </span> 
+        <button type="submit" class="btn btn-link">삭제하기</button>
+        </p>
       </form>
       {% comment %} 로그인이 안 되어 있으면 내용만 보여준다 {% endcomment %}
       {% else %}
-      <span>{{ comment.content }} - {{ comment.created_at }}</span>
+      <span>[{{ comment.user }}] {{ comment.content }} ({{ comment.created_at }})</span>
       {% endif %}
     </li>
   {% endfor %}

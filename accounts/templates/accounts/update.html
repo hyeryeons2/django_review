@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block title %}Accounts:수정{% endblock title %}
+
+{% block container %}
+<h2>내 정보 수정</h2>
+{% comment %} 지금 accounts/update/ 에 있는데 accounts/update 동일한 URL에 POST로 보내는 것{% endcomment %}
+{% comment %} form action에 값을 주지 않으면 동일한 곳으로 보내게 됨 {% endcomment %}
+<form method="POST">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">수정하기</button> 
+</form>
+{% endblock container %}
