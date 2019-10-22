@@ -142,3 +142,13 @@ def comments_delete(request, article_pk, comment_pk):
     # 이 설정 후, 쿠키>session 삭제하면, 로그아웃이 되고, 그 상태에서 댓글 삭제를 하면 
     # 401 페이지와 함께 you are Unauthorized 가 출력됨
     return HttpResponse('You are Unauthorized', status=401)
+
+
+def like(request, article_pk):
+    user = request.user
+    article = get_object_or_404(Article, pk=article_pk)
+    if article.liked_users.filter(pk=user.pk).exists():
+            user.liked_articles.remove(article)
+    else:
+        user.liked_articles.add(article)
+    return redirect('articles:detail', article_pk)

@@ -4,6 +4,9 @@ from . import views
 app_name = 'articles'
 
 urlpatterns = [
+    # 좋아요
+    path('<int:article_pk>/like/', views.like, name='like'),
+
     path('<int:article_pk>/comments/<int:comment_pk>/delete/', views.comments_delete, name='comments_delete'),
 
     # comment url 만들기
