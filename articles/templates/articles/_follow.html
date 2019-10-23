@@ -1,0 +1,21 @@
+<div class="jumbotron text-center text-white bg-dark">
+  <p class="lead mb-1">작성자 정보</p>
+  <h1 class="display-4">{{ article.user.username }}</h1>
+  <hr>
+  <p class="lead">
+    팔로잉: {{ article.user.followings.all|length }} 명 /
+    팔로워: {{ article.user.followers.all|length }} 명
+  </p>
+
+{% comment %} 본인이 본인을 팔로우 하지 못하게 하는 설정함 {% endcomment %}
+  {% if user != article.user %}
+    {% if user in article.user.followers.all %}
+    {% comment %} 언팔버튼 {% endcomment %}
+    <a href=" {% url 'articles:follow' article.pk article.user.pk %} " class="btn btn-primary btn-lg">Unfollow</a>
+    {% else %}
+    {% comment %} 팔로우버튼 {% endcomment %}
+    <a href=" {% url 'articles:follow' article.pk article.user.pk %} " class="btn btn-primary btn-lg">follow</a>
+    {% endif %}
+  {% endif %}
+
+</div>

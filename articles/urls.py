@@ -4,6 +4,9 @@ from . import views
 app_name = 'articles'
 
 urlpatterns = [
+    # follow url
+    path('<int:article_pk>/follow/<int:user_pk>/', views.follow, name='follow'),
+
     # 좋아요
     path('<int:article_pk>/like/', views.like, name='like'),
 

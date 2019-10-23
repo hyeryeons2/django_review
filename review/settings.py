@@ -131,3 +131,5 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets')
 ]
 
+# customized 한 USER 모델을 등록하는 작업
+AUTH_USER_MODEL = 'accounts.User'  # accounts(앱이름) 의 User 모델에 정의했음

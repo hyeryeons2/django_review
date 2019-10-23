@@ -15,6 +15,7 @@ class Article(models.Model):
     # USER 정보가 없어지면, Article 정보도 없어진다.
     # 다른 모든 곳에서는 get_user_model로 가져오되, models.py에서 user을 가져올 땐 django setting의
     # default 된 user model을 가져와야 함
+    # AUTH_USER_MODEL 을 기억해야함★★★★
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     # 좋아요 누른 유저

@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, Pass
 from django.contrib.auth import login as auth_login, logout as auth_logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
-from .forms import CustomUserChangeForm
+from .forms import CustomUserChangeForm, CustomUserCreationForm
 
 
 def signup(request):
@@ -15,7 +15,7 @@ def signup(request):
     if request.method == 'POST':
         # 회원가입 로직
         # get에서 보낸 데이터 from을 post로 받고
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         # 유효성 검사후, 통과하면 저장하기
         if form.is_valid():
             form.save()
@@ -25,7 +25,7 @@ def signup(request):
             return redirect('articles:index')
     else:
         # usercreationform을 context로 저장해서 signup html에서 보여준다
-        form = UserCreationForm()
+        form = CustomUserCreationForm()
     # get, post 둘다 실행 가능
     context = {'form': form}
     return render(request, 'accounts/form.html', context)

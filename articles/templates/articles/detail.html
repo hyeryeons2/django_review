@@ -37,7 +37,7 @@
   {% comment %} /articles/3/delete/로 보내야 하니까 action {% endcomment %}
   <form action="{% url 'articles:delete' article.pk %}" method="POST">
     {% csrf_token %}
-    <button type="submit">삭제하기</button>
+    <button type="submit" class="btn btn-danger">삭제하기</button>
   </form>
   <hr>
   {% endif %}
@@ -78,5 +78,7 @@
   {% endfor %}
   </ul>
 
+{% comment %} articles/_follow에 있는 html 가져와주세요! {% endcomment %}
+  {% include 'articles/_follow.html' %}
 
 {% endblock container %}

@@ -17,8 +17,8 @@
 </head>
 
 <body>
-  <header>
-    <h1 class="text-primary">페이지에 오신 걸 환영합니다:)</h1><br>
+  <header class="container">
+    <h1 class="text-secondary"><span class="text-primary">페이지</span>에 오신 걸 환영합니다:)</h1><br>
 
     {% comment %} 로그인이 되었다면, {% endcomment %}
     {% if user.is_authenticated %}
@@ -45,7 +45,11 @@
     <a href="{% url 'articles:index' %}">[홈 화면]</a> 
     <hr>
   </header>
+
+  <div class="container">
   {% block container %}{% endblock container %}
+  </div>
+
 
   {% comment %} js 가져오기 {% endcomment %}
   <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>

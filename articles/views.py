@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404  # redirect 추가
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from .forms import ArticleForm, CommentForm
 from .models import Article, Comment
@@ -147,8 +148,31 @@ def comments_delete(request, article_pk, comment_pk):
 def like(request, article_pk):
     user = request.user
     article = get_object_or_404(Article, pk=article_pk)
-    if article.liked_users.filter(pk=user.pk).exists():
+
+    # if user in aricle_liked_users.all(): 과 바로 밑 한 줄과 같음
+    if article.liked_users.filter(pk=user.pk).exists():  # 1개 데이터라도 존재하면 True
             user.liked_articles.remove(article)
     else:
         user.liked_articles.add(article)
+    return redirect('articles:detail', article_pk)
+
+@login_required
+# user_pk == 팔로우 할 대상
+def follow(request, article_pk, user_pk):
+    # 로그인 한 유저가 게시글 유저를 follow or unfollow 하는 기능 구현
+    # 로그인 유저 가져오는 작업(요청 보내는 유저)
+    user = request.user
+    # 게시글 작성한 유저 가져오는 작업(팔로우/언팔로우 할 사람)
+    person = get_object_or_404(get_user_model(), pk=user_pk)  # 게시글 주인
+    # get_user_model 하려면 상단에서 import 해야 함
+
+    # 지금 로그인한 사람이 게시글을 쓴 사람의 follow 목록에 있다면,
+    # == 이미 팔로우 상태에서 팔로우 한 번 더 누르는 거
+    # == 언팔
+    if user in person.followrs.all():
+        person.followers.remove(user)  # 언팔
+    else:  # 팔로우 상태가 아니면,
+        person.followers.add(user)  # 팔로우한다
+
+    # article_pk 가져와야 어느 게시글에서 받아서 어느 게시글에 보내줄 지 알 수 있음    
     return redirect('articles:detail', article_pk)
