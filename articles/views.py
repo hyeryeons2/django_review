@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404  # redirect 추
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import get_user_model
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from .forms import ArticleForm, CommentForm
 from .models import Article, Comment
 from IPython import embed 
@@ -87,6 +87,7 @@ def update(request, article_pk):
     context = {'form': form}
     return render(request, 'articles/update.html', context)
 
+
 # login_required 는 get 요청에만 가능하므로 POST에는 쓸 수 없음
 # @login_required
 # /articles/3/delete/
@@ -152,9 +153,17 @@ def like(request, article_pk):
     # if user in aricle_liked_users.all(): 과 바로 밑 한 줄과 같음
     if article.liked_users.filter(pk=user.pk).exists():  # 1개 데이터라도 존재하면 True
             user.liked_articles.remove(article)
+            liked = False
     else:
         user.liked_articles.add(article)
-    return redirect('articles:detail', article_pk)
+        liked = True
+    context = {
+        'liked': liked,
+        'count': article.liked_users.count(),  # article을 좋아요 한 유저
+    }
+    # return redirect('articles:detail', article_pk)
+    return JsonResponse(context)  
+
 
 @login_required
 # user_pk == 팔로우 할 대상

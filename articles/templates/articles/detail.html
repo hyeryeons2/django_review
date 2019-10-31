@@ -10,17 +10,28 @@
   <p class="text-secondary"> 작성자: {{ article.user }}</p>
   <hr>
 
-{% comment %} 좋아요 {% endcomment %}
-  <a href=" {% url 'articles:like' article.pk %} ">
+{% comment %} 좋아요 구현 {% endcomment %}
+  {% comment %} <a href=" {% url 'articles:like' article.pk %} "> {% endcomment %}
   {% comment %} 좋아요를 눌렀다면, {% endcomment %}
-  {% if user in article.liked_users.all %}
-  <i class="fas fa-heart fa-lg" style="color: red"></i>  
+  {% comment %} {% if user in article.liked_users.all %}
+  <i class="fas fa-heart fa-lg" style="color: pink"></i>  
   {% else %}
-  <i class="far fa-heart fa-lg" style="color: red"></i>
+  <i class="far fa-heart fa-lg" style="color: pink"></i>
   {% endif %}
-  </a>
+  </a> {% endcomment %}
 
-  <span class='text-success'>{{ article.liked_users.all | length }} 명이 이 글을 좋아합니다!</span>
+
+  {% comment %} js 활용한 좋아요 구현 {% endcomment %}
+  <i
+   class=" {% if user in article.liked_users.all %}fas{% else %}far{% endif %} fa-heart fa-lg" 
+   id="like-btn" 
+   data-id="{{ article.pk }}"
+   style="color: red"
+   >
+   </i>
+
+  {% comment %} <span class='text-success'>{{ article.liked_users.all | length }} 명이 이 글을 좋아합니다!</span> {% endcomment %}
+  <p> <span id="like-count" class='text-success'>{{ article.liked_users.all | length }}</span>명이 이 글을 좋아합니다</p>
   <hr>
   <p>{{ article.content }}</p>
   <hr>
@@ -79,6 +90,36 @@
   </ul>
 
 {% comment %} articles/_follow에 있는 html 가져와주세요! {% endcomment %}
-  {% include 'articles/_follow.html' %}
+{% include 'articles/_follow.html' %}
 
+<script>
+  const likeButton = document.querySelector('#like-btn')
+  likeButton.addEventListener('click', () => {
+    console.log(event)
+
+    // Button 의 data-id 속성을 아래 코드로 가지고 온다
+    const articleId = event.target.dataset.id
+
+    axios.get(`/articles/${articleId}/like/`)
+    .then(function(response){
+      // console.log(response)
+
+      // 사용자의 좋아요 여부에 따라 버튼 클래스 변경
+      if(response.data.liked) {
+        // console.log(likeButton.classList)
+        likeButton.classList.remove('far')
+        likeButton.classList.add('fas')
+        } else {
+        likeButton.classList.remove('fas')
+        likeButton.classList.add('far')
+        }
+
+        // article을 좋아하는 사람들의 데이터 수를 응답받아 적용
+        const likeCount = document.querySelector('#like-count')
+        likeCount.innerText = response.data.count
+      
+    })
+  })
+
+</script>
 {% endblock container %}
